@@ -90,6 +90,25 @@ class Customer {
       );
     }
   }
+
+  /** Returning instance's property of first and last name */
+  fullName(){
+    return `${this.firstName} ${this.lastName}`
+  }
+
+
+  static async search(name){
+    const result = await db.query(
+      `SELECT id, first_name, last_name, phone, notes
+        FROM customers
+        WHERE name = $1
+      `, [this.name]
+    )
+    console.log(result.rows[0])
+    return result.rows[0]
+  }
+
+
 }
 
 module.exports = Customer;
