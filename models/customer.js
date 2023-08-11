@@ -97,17 +97,33 @@ class Customer {
   }
 
 
-  static async search(name){
-    const result = await db.query(
-      `SELECT id, first_name, last_name, phone, notes
+  static async search(searchTerm){
+    const results = await db.query(
+      `SELECT id, first_name AS "firstName", last_name AS "lastName", phone, notes
         FROM customers
-        WHERE name = $1
-      `, [this.name]
+        WHERE CONCAT(first_name,' ',last_name) ILIKE $1`, [`%${searchTerm}%`]
     )
-    console.log(result.rows[0])
-    return result.rows[0]
+    console.log("this is the result ==>", results.rows)
+    return results.rows.map(c => new Customer(c));
   }
 
+  /**  Return a list of customers with most reservations */
+  static async findTopTen() {
+    const results = await db.query(
+      // we want to join both tables
+      // we want to join only on cust.id = res.cust_id
+      // then group by cust id
+      // order by COUNT (cust id)
+      // limit 10 (DESC)
+      `SELECT id, first_name AS "firstName", last_name AS "lastName", phone, notes
+        FROM customers AS c
+        JOIN reservations AS r
+        ON c.id = r.customer_id
+        GROUP BY c.id
+        ORDER BY COUNT(c.id) DESC
+        LIMIT 10`);
+        return results.rows.map(c => new Customer(c));
+  }
 
 }
 

@@ -13,13 +13,13 @@ const router = new express.Router();
 /** Homepage: show list of customers. */
 
 router.get("/", async function (req, res, next) {
-  let customers ;
+  let customers;
   if(req.query.search){
     customers = await Customer.search(req.query.search)
   }else{
     customers = await Customer.all()
   }
-
+  console.log("customers -->", customers);
   return res.render("customer_list.html", { customers });
 });
 
@@ -97,5 +97,7 @@ router.post("/:id/add-reservation/", async function (req, res, next) {
 
   return res.redirect(`/${customerId}/`);
 });
+
+router.get("/top-ten")
 
 module.exports = router;
